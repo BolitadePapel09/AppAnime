@@ -5,8 +5,70 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+import { 
+  useState,
+  useEffect
+} from "react";
+import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+console.log("Cargando usuario.jsx");
 
 export default function Usuario() {
+  const router = useRouter();
+ const [datosUsuario, setDatosUsuario] = useState(null);
+
+useEffect(() => {
+
+  console.log("ENTRANDO A PERFIL");
+
+  cargarUsuario();
+
+}, []);
+
+ const cargarUsuario = async () => {
+
+      try {
+
+        const usuarioGuardado = await AsyncStorage.getItem("usuario");
+
+        console.log("DATOS DESDE STORAGE:", usuarioGuardado);
+
+
+        if(usuarioGuardado !== null){
+
+          const datos = JSON.parse(usuarioGuardado);
+
+          console.log("USUARIO CONVERTIDO:", datos);
+
+          setDatosUsuario(datos);
+
+        }else{
+
+          console.log("NO EXISTE USUARIO EN STORAGE");
+
+        }
+
+
+      } catch(error){
+
+        console.log("ERROR STORAGE:", error);
+
+      }
+
+  };
+
+
+  const cerrarSesion = async () => {
+
+    await AsyncStorage.removeItem("usuario");
+
+    alert("Sesión cerrada");
+
+    router.replace("/login");
+
+  };
+
   return (
     <View style={styles.container}>
 
@@ -17,30 +79,44 @@ export default function Usuario() {
         style={styles.imagen}
       />
 
-      <Text style={styles.nombre}>EdiOtaku09</Text>
+      <Text style={styles.nombre}>
+        {datosUsuario?.usuario}
+      </Text>
 
       <Text style={styles.descripcion}>
         Amante del anime y manga
       </Text>
+      <Text>
+        Estado: {datosUsuario ? "Usuario cargado" : "Cargando usuario"}
+      </Text>
 
         <View style={styles.card}>
-        <Text style={styles.titulo}>Nombre Completo</Text>
-        <Text style={styles.texto}>
-          Edilson Jimenez MArtinez
-        </Text>
-      </View>
+          <Text style={styles.titulo}>
+            Nombre Completo
+          </Text>
+
+          <Text style={styles.texto}>
+            {datosUsuario?.nombre} {datosUsuario?.apellidos}
+          </Text>
+        </View>
 
       <View style={styles.card}>
-        <Text style={styles.titulo}>Correo</Text>
-        <Text style={styles.texto}>
-          edilson@email.com
-        </Text>
-      </View>
+          <Text style={styles.titulo}>
+            Correo
+          </Text>
+
+          <Text style={styles.texto}>
+            {datosUsuario?.correo}
+          </Text>
+        </View>
 
       <View style={styles.card}>
-        <Text style={styles.titulo}>Teléfono</Text>
+        <Text style={styles.titulo}>
+          Fecha de nacimiento
+        </Text>
+
         <Text style={styles.texto}>
-          Sin registrar
+          {datosUsuario?.fechaNacimiento}
         </Text>
       </View>
 
@@ -54,6 +130,7 @@ export default function Usuario() {
 
       <TouchableOpacity
         style={[styles.boton, { backgroundColor: "#e53935" }]}
+        onPress={cerrarSesion}
       >
         <Text style={styles.textoBoton}>
           Cerrar sesión
@@ -63,6 +140,8 @@ export default function Usuario() {
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

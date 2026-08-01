@@ -1,10 +1,14 @@
+import { registrarUsuario } from "../services/auth";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
+
+import { useState } from "react";
 
 import { useRouter } from "expo-router";
 
@@ -12,44 +16,99 @@ export default function Registro() {
 
   const router = useRouter();
 
+  const [nombre, setNombre] = useState("");
+  const [apellidos, setApellidos] = useState("");
+  const [usuario, setUsuario] = useState("");
+  const [fechaNacimiento, setFechaNacimiento] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [password, setPassword] = useState("");
+
+ const registrar = async () => {
+console.log("Nombre:", nombre);
+  if (
+    nombre === "" ||
+    apellidos === "" ||
+    usuario === "" ||
+    fechaNacimiento === "" ||
+    correo === "" ||
+    password === ""
+  ) {
+    alert("Debes llenar todos los campos.");
+    return;
+  }
+
+  const nuevoUsuario = {
+    nombre,
+    apellidos,
+    usuario,
+    fechaNacimiento,
+    correo,
+    password,
+  };
+
+  const guardado = await registrarUsuario(nuevoUsuario);
+
+  if (guardado) {
+    alert("Usuario registrado correctamente");
+    router.back();
+  } else {
+    alert("Ocurrió un error al registrar");
+  }
+};
+
   return (
     <View style={styles.container}>
 
       <Text style={styles.titulo}>Crear cuenta</Text>
 
-      <TextInput
-        placeholder="Nombre"
-        style={styles.input}
-      />
+        <TextInput
+    placeholder="Nombre"
+    value={nombre}
+    onChangeText={setNombre}
+    style={styles.input}
+/>
        <TextInput
-        placeholder="Apellidos"
-        style={styles.input}
-      />
+    placeholder="Apellidos"
+    value={apellidos}
+    onChangeText={setApellidos}
+    style={styles.input}
+/>
        <TextInput
-        placeholder="Nombre de usuario"
-        style={styles.input}
-      />
+    placeholder="Nombre de usuario"
+    value={usuario}
+    onChangeText={setUsuario}
+    style={styles.input}
+/>
        <TextInput
-        placeholder="Fecha de nacimiento"
-        style={styles.input}
-      />
+    placeholder="Fecha de nacimiento"
+    value={fechaNacimiento}
+    onChangeText={setFechaNacimiento}
+    style={styles.input}
+/>
 
       <TextInput
-        placeholder="Correo"
-        style={styles.input}
-      />
+    placeholder="Correo"
+    value={correo}
+    onChangeText={setCorreo}
+    style={styles.input}
+/>
 
       <TextInput
-        placeholder="Contraseña"
-        secureTextEntry
-        style={styles.input}
-      />
+    placeholder="Contraseña"
+    secureTextEntry
+    value={password}
+    onChangeText={setPassword}
+    style={styles.input}
+/>
 
-      <TouchableOpacity style={styles.boton}>
-        <Text style={styles.textoBoton}>
-          Registrarse
-        </Text>
-      </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.boton}
+      onPress={registrar}
+    >
+      <Text style={styles.textoBoton}>
+        Registrarse
+      </Text>
+    </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.back()}>
         <Text style={styles.regresar}>
@@ -59,7 +118,12 @@ export default function Registro() {
 
     </View>
   );
+  
 }
+
+
+
+
 
 const styles = StyleSheet.create({
   container:{

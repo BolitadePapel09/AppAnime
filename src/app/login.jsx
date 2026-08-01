@@ -1,3 +1,4 @@
+import { obtenerUsuario } from "../services/auth";
 import { 
   View,
   Text,
@@ -7,6 +8,7 @@ import {
   Image
 } from "react-native";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 
@@ -19,10 +21,37 @@ export default function Login(){
 
 
 
-  const iniciarSesion = ()=>{
+  const iniciarSesion = async () => {
+    console.log("Botón entrar presionado");
 
-    console.log(usuario);
-    console.log(password);
+      const datosUsuario = await obtenerUsuario();
+
+      if (!datosUsuario) {
+        alert("No existe ningún usuario registrado");
+        return;
+      }
+
+      if (
+          (usuario === datosUsuario.usuario ||
+          usuario === datosUsuario.correo) &&
+          password === datosUsuario.password
+        ) {
+
+          await AsyncStorage.setItem(
+            "usuario",
+            JSON.stringify(datosUsuario)
+          );
+          console.log("Guardando usuario:", datosUsuario);
+
+          alert(`Bienvenido ${datosUsuario.nombre}`);
+
+          router.replace("/(tabs)");
+
+      }else {
+
+        alert("Usuario o contraseña incorrectos");
+
+      }
 
   };
 

@@ -11,51 +11,64 @@ const index = () => {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('https://api.jikan.moe/v4/anime')
-      .then(respuesta => respuesta.json())
-      .then(respuesta => {
-        const anime = [];
-        respuesta.data.map(({ mal_id, title, type, source, episodes, status, duration, score, rating, images, trailer, synopsis, genres, studios, year }) => {
-          anime.push({
-            mal_id: mal_id,
-            title: title,
-            type: type,
-            source: source,
-            episodes: episodes,
-            status: status,
-            duration: duration,
-            score: score,
-            rating: rating,
-            images: images,
-            trailer: trailer,
-            synopsis: synopsis,
-            genres: genres,
-            studios: studios,
-            year: year
+
+      fetch('https://api.jikan.moe/v4/anime')
+        .then(respuesta => respuesta.json())
+        .then(respuesta => {
+
+          console.log("Respuesta API:", respuesta);
+
+          if (!respuesta.data) {
+            console.log("La API no devolvió datos");
+            return;
+          }
+
+          const anime = [];
+
+          respuesta.data.map((item) => {
+
+            anime.push({
+
+              mal_id: item.mal_id,
+              title: item.title,
+              type: item.type,
+              source: item.source,
+              episodes: item.episodes,
+              status: item.status,
+              duration: item.duration,
+              score: item.score,
+              rating: item.rating,
+              images: item.images,
+              trailer: item.trailer,
+              synopsis: item.synopsis,
+              genres: item.genres,
+              studios: item.studios,
+              year: item.year
+
+            });
+
           });
+
+          setContenido(anime);
+
+        })
+
+        .catch(error => {
+          console.log("Error consultando API:", error);
         });
-        setContenido(anime);
-      });
+
   }, []);
 
   return (
   <ScrollView contentContainerStyle={styles.container}>
     <StatusBar style="auto" />
 
-    <TouchableHighlight onPress={() => router.navigate('/login')}>
-      <Text>Login</Text>
-    </TouchableHighlight>
+   
 
-    <TouchableHighlight 
-        onPress={() => router.push('/manga')}
-      >
-        <Text>
-          Manga
-        </Text>
-    </TouchableHighlight>
+    
     
 
-    {contenido.map((anime) => (
+    {contenido?.map((anime) => (
   <Pressable
     key={anime.mal_id}
     onPress={() => router.push({
